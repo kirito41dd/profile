@@ -4,6 +4,13 @@ if (sys host | get name) == "Windows" {
     $env.config.buffer_editor = "vim"
 }
 
+$env.config = {
+  datetime_format: {
+      normal: "%Y/%m/%d %H:%M:%S %z"
+      table: "%Y/%m/%d %H:%M:%S"
+  }
+}
+
 def git_main_branch [] {
     git remote show origin
         | lines
