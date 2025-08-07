@@ -1,3 +1,9 @@
+if (sys host | get name) == "Windows" {
+    $env.config.buffer_editor = "code"
+} else {
+    $env.config.buffer_editor = "vim"
+}
+
 def git_main_branch [] {
     git remote show origin
         | lines
