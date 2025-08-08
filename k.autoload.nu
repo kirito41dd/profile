@@ -5,21 +5,53 @@ if (sys host | get name) == "Windows" {
 }
 
 $env.config = {
-  datetime_format: {
-      normal: "%Y/%m/%d %H:%M:%S %z"
-      table: "%Y/%m/%d %H:%M:%S"
-  }
+    # 时间展示的默认格式化
+    datetime_format: {
+        normal: "%Y/%m/%d %H:%M:%S %z"
+        table: "%Y/%m/%d %H:%M:%S"
+    }
 }
 
-def git_main_branch [] {
-    git remote show origin
-        | lines
-        | str trim
-        | find --regex 'HEAD .*?[：: ].+'
-        | first
-        | ansi strip
-        | str replace --regex 'HEAD .*?[：: ]\s*(.+)' '$1'
+# 获取git仓库的当前分支，如果不在git仓库中返回null
+def git_current_branch [] {
+    let b = do { git rev-parse --abbrev-ref HEAD } | complete
+    if $b.exit_code != 0 {
+        return
+    }
+    let b = $b.stdout | str trim
+    if $b == "HEAD" {
+        git rev-parse --short=8 HEAD
+    } else {
+        $b
+    }
 }
+
+# 获取git仓库的主分支
+def git_main_branch [] {
+    git branch --format='%(refname:short)' | lines | find -nr '(^main$)|(^master$)' | first
+}
+
+# 构造命令行提示符
+def gen_prompt [] {
+    let custom_path = if (pwd) == ($nu.home-path | path expand) {
+        "~"
+    } else {
+        (pwd | path basename)
+    }
+
+    let b = git_current_branch
+    let git_display = if $b != null {
+        $" (ansi blue_bold)git:\((ansi red)($b)\)(ansi reset)"
+    } else {
+        ""
+    }
+    let color_path = $"(ansi green_bold)($custom_path)(ansi reset)"
+    let color_arrow = $"(ansi green)➜(ansi reset)"
+    $"($color_path)($git_display)"
+}
+
+$env.PROMPT_COMMAND =  { gen_prompt }
+$env.PROMPT_COMMAND_RIGHT = { date now | format date "%Y/%m/%d %H:%M:%S" }
 
 alias g = git
 alias ga = git add
