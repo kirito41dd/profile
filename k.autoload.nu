@@ -53,6 +53,22 @@ def gen_prompt [] {
 $env.PROMPT_COMMAND =  { gen_prompt }
 $env.PROMPT_COMMAND_RIGHT = { date now | format date "%Y/%m/%d %H:%M:%S" }
 
+def open-folder [path?: string] {
+    let host = sys host | get name;
+    let target_path = if $path != null {
+        $path | path expand
+    } else {
+        $env.PWD | path expand
+    }
+    if $host == "Windows" {
+        explorer $target_path
+    } else if $host == "Darwin" {
+        ^open $target_path
+    } else {
+        error make {msg: "Unsupported host: $host"}
+    }
+}
+
 alias g = git
 alias ga = git add
 alias gb = git branch
