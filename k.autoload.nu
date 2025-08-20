@@ -88,7 +88,7 @@ def gen_prompt [] {
     } else {
         ""
     }
-    let color_path = $"(ansi cyan_bold)($custom_path)(ansi reset)"
+    let color_path = $"(ansi green_bold)($custom_path)(ansi reset)"
     let color_arrow = $"(if $env.LAST_EXIT_CODE == 0 {ansi green_bold} else {ansi red_bold})➜(ansi reset)"
     $"($color_arrow) ($color_path)($git_display) "
 }
