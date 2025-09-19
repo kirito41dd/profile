@@ -120,3 +120,5 @@ alias gb = git branch
 alias gcm = git checkout (git_main_branch)
 alias gco = git checkout
 alias gst = git status
+alias grbm = git rebase (git_main_branch)
+alias configk = ^$env.config.buffer_editor ($nu.user-autoload-dirs.0)/k.autoload.nu
