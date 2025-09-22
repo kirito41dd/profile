@@ -1,5 +1,7 @@
 if (sys host | get name) == "Windows" {
     $env.config.buffer_editor = "code"
+} else if (sys host | get name) == "Darwin" {
+    $env.config.buffer_editor = "code"
 } else {
     $env.config.buffer_editor = "vim"
 }
@@ -122,3 +124,18 @@ alias gco = git checkout
 alias gst = git status
 alias grbm = git rebase (git_main_branch)
 alias configk = ^$env.config.buffer_editor ($nu.user-autoload-dirs.0)/k.autoload.nu
+
+
+# 加载.env文件，带参数可以指定路径
+def --env load-env-file [
+    file?: string = ".env"  # 可选参数，默认加载当前目录的 .env 文件
+] {
+    open $file | lines 
+    | split column '#' 
+    | get column1 
+    | where {($in | str length) > 0} 
+    | parse "{key}={value}"
+    | update value {str trim -c '"'}
+    | transpose -r -d
+    | load-env
+}
