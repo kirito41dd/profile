@@ -22,8 +22,15 @@ def find_git_dir [] {
     while $current_dir != ($current_dir | path dirname) {
         let git_dir = ($current_dir | path join ".git")
  
-        if ($git_dir | path exists) {
+        if ($git_dir | path exists) and ($git_dir | path type) == "dir" {
             return $git_dir
+        } else {
+            # 可能在submodule
+            let content = ($git_dir | open --raw)
+            if ($content =~ "gitdir:") {
+                let real_git_path = ($content | str trim | str replace "gitdir: " "")
+                return $real_git_path
+            }
         }
  
         # 进入上一级目录
