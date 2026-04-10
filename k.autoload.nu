@@ -14,6 +14,17 @@ $env.config = {
     }
 }
 
+# 新版本$nu.home-path改为了$nu.home-dir 写个breakchange的兼容函数
+def _get-home-dir [] {
+     if ("home-dir" in ($nu | columns)) {
+        $nu.home-dir
+    } else if ("home-path" in ($nu | columns)) {
+        $nu.home-path
+    }  else {
+        $env.HOME
+    }
+}
+
 
 
 def find_git_dir [] {
@@ -87,7 +98,7 @@ def git_main_branch [] {
 
 # 构造命令行提示符
 def gen_prompt [] {
-    let custom_path = if (pwd) == ($nu.home-path | path expand) {
+    let custom_path = if (pwd) == (_get-home-dir | path expand) {
         "~"
     } else {
         (pwd | path basename)
